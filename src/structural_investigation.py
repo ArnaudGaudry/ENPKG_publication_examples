@@ -230,9 +230,9 @@ fig.update_yaxes(visible=False)
 
 fig.show()
   
-fig.write_html(f"/mnt/c/Users/gaudrya.FARMA/Desktop/chembl_annot_color_{category}.html")
-fig.write_image(f"/mnt/c/Users/gaudrya.FARMA/Desktop/chembl_annot_color_{category}.jpeg",  scale=3)
-fig.write_image(f"/mnt/c/Users/gaudrya.FARMA/Desktop/chembl_annot_color_{category}.svg",  scale=3)
+fig.write_html(f"../data/structural_investigation/tmap/chembl_annot_color_{category}.html")
+fig.write_image(f"../data/structural_investigation/tmap/chembl_annot_color_{category}.jpeg",  scale=3)
+fig.write_image(f"../data/structural_investigation/tmap/chembl_annot_color_{category}.svg",  scale=3)
 
 
 
@@ -367,9 +367,9 @@ fig.update_yaxes(visible=False)
 fig.show()
 
   
-fig.write_html(f"/mnt/c/Users/gaudrya.FARMA/Desktop/pristimera_color_similarity.html")
-fig.write_image(f"/mnt/c/Users/gaudrya.FARMA/Desktop/pristimera_color_similarity.jpeg",  scale=3)
-fig.write_image(f"/mnt/c/Users/gaudrya.FARMA/Desktop/pristimera_color_similarity.svg",  scale=3)
+fig.write_html(f"../data/structural_investigation/tmap/pristimera_color_similarity.html")
+fig.write_image(f"../data/structural_investigation/tmap/pristimera_color_similarity.jpeg",  scale=3)
+fig.write_image(f"../data/structural_investigation/tmap/pristimera_color_similarity.svg",  scale=3)
 
 
 

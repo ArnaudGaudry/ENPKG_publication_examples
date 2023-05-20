@@ -91,7 +91,7 @@ def compute_tmap(table):
     x, y, s, t, _ = tm.layout_from_lsh_forest(lf, CFG_TMAP)
     return x, y, s, t
 
-memo_matrix = dt.fread('/mnt/c/Users/gaudrya.FARMA/Desktop/VGF_data_organized/003_memo_analysis/memo_both_blanks_occ_0.gz').to_pandas()
+memo_matrix = dt.fread('../data/memo_both_blanks_occ_0.gz').to_pandas()
 memo_matrix.set_index('filename', inplace=True)
 memo_matrix = memo_matrix[memo_matrix.index.isin(df.extract)]
 memo_matrix = memo_matrix.reindex(df.extract)
@@ -178,7 +178,7 @@ for ax, coord in zip([ax1, ax2, ax3], [('tmap_x', 'tmap_y'), None, ('umap_x', 'u
               zorder=1,    
           )
             
-plt.savefig('/mnt/c/Users/gaudrya.FARMA/Desktop/memo_both_plot_activity.png', bbox_inches='tight')
+plt.savefig('../output/rotenoids/memo_both_plot_activity.png', bbox_inches='tight')
 
 ### TMAP OF ANNOTATIONS OF SELECTED SAMPLES
 
@@ -411,7 +411,7 @@ for ax, cat in zip([ax1, ax2, ax3, ax4], categories) :
     cbar.ax.set_title(dic_cat[cat]['title'], fontsize=22)
   ax.axis('off')
   
-plt.savefig('/mnt/c/Users/gaudrya.FARMA/Desktop/active_cluster_annotations_tmap.png', bbox_inches='tight')
+plt.savefig('../output/rotenoids/active_cluster_annotations_tmap.png', bbox_inches='tight')
 
 
 ### CANOPUS Analysis
@@ -477,7 +477,7 @@ ax.tick_params(axis='x', labelsize=10)
 ax.tick_params(axis='y', labelsize=10)
 ax.set_xlabel('Anti-$\it{T. cruzi}$ activity', fontsize=13)
 ax.set_ylabel('Number of features annotated\nas rotenoids (CANOPUS, p > 0.5)', fontsize=13)
-plt.savefig('/mnt/c/Users/gaudrya.FARMA/Desktop/canopus_count_rotenoids_vs_activity.png', bbox_inches='tight')
+plt.savefig('../output/rotenoids/canopus_count_rotenoids_vs_activity.png', bbox_inches='tight')
 
 
 
@@ -588,6 +588,6 @@ ax.text(*np.array((12.5, 14)), 'Over-annotated', fontsize=13, c='grey',
           rotation=angle, rotation_mode='anchor',
           transform_rotates_text=True)
 
-plt.savefig('/mnt/c/Users/gaudrya.FARMA/Desktop/canopus_all_classes_difference.png', bbox_inches='tight', dpi=300)
+plt.savefig('../output/rotenoids/canopus_all_classes_difference.png', bbox_inches='tight', dpi=300)
 
 px.scatter(x= df2['avg_tot'], y = df2['avg_sel'], color=df2['np_class'])
