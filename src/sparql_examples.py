@@ -458,15 +458,103 @@ sparql.setQuery("""
         
          {SELECT ?peakloss WHERE {
           ?feature rdf:type enpkg:LCMSFeature
-          FILTER(regex(str(?feature), "LP_P03_35_features_ms2_pos.mgf:scan:1$"))
+          FILTER(regex(str(?feature), "SC_AP_Wi_DCM_features_ms2_pos.mgf:scan:1$"))
             ?feature enpkg:has_spec2vec_doc ?doc .
               ?doc enpkg:has_spec2vec_loss|enpkg:has_spec2vec_peak ?peakloss .
             }
            }
          } GROUP BY ?feature ORDER BY DESC(?count)
-    #   }
-    # }
 """)
+
+results = sparql.queryAndConvert()
+df = json_normalize(results['results']["bindings"])
+df = df.stack().str.replace(uri_ref, "").unstack()
+df.drop(list(df.filter(regex = 'type')), axis = 1, inplace = True)
+df.columns = df.columns.str.replace('.value', '')
+df
+
+# Query 8: get the features, annotated as M+H by SIRIUS, for which the M-H adduct is detected in the same RT range for a given sample
+
+sparql.setQuery("""
+    PREFIX enpkg: <https://enpkg.commons-lab.org/kg/>
+    PREFIX enpkgmodule: <https://enpkg.commons-lab.org/module/>
+    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+    PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+              
+    SELECT DISTINCT ?feature ?rt ?pm #?feature_opp ?rt_opp ?pm_opp
+    WHERE
+    { 
+        VALUES ?ppm {
+            "5"^^xsd:decimal
+            }
+        
+        ?sample rdf:type enpkg:LabExtract
+        FILTER(regex(str(?sample), "VGF156_A06"))
+        
+        ?sample enpkg:has_LCMS ?lcms .
+            ?lcms rdf:type enpkg:LCMSAnalysisPos .
+            ?lcms enpkg:has_lcms_feature_list ?feature_list .
+                ?feature_list enpkg:has_lcms_feature ?feature .                    
+                    ?feature enpkg:has_parent_mass ?pm .
+                    ?feature enpkg:has_retention_time ?rt .
+                    ?feature enpkg:has_sirius_annotation ?sirius .
+                        ?sirius enpkg:has_sirius_adduct ?adduct .
+                        FILTER(regex(str(?adduct), "[M+H]+"))
+            
+        ?sample enpkg:has_LCMS ?lcms_opp .
+        ?lcms_opp rdf:type enpkg:LCMSAnalysisNeg .
+        ?lcms_opp enpkg:has_lcms_feature_list ?feature_list_opp .
+            ?feature_list_opp enpkg:has_lcms_feature ?feature_opp .
+            ?feature_opp enpkg:has_parent_mass ?pm_opp .
+            ?feature_opp enpkg:has_retention_time ?rt_opp .
+        FILTER(((?rt - 0.05) < ?rt_opp) && ((?rt + 0.05) > ?rt_opp))
+        FILTER((?pm_opp > ((?pm - 2.014) - ((?ppm * 0.000001) * (?pm - 2.014)))) && (?pm_opp < ((?pm - 2.014) + ((?ppm * 0.000001) * (?pm - 2.014)))))
+    }
+""")
+
+
+results = sparql.queryAndConvert()
+df = json_normalize(results['results']["bindings"])
+df = df.stack().str.replace(uri_ref, "").unstack()
+df.drop(list(df.filter(regex = 'type')), axis = 1, inplace = True)
+df.columns = df.columns.str.replace('.value', '')
+df
+
+# Query 9: get the features wor which a feature with the same annotation is found at the same RT
+
+sparql.setQuery("""
+    PREFIX enpkg: <https://enpkg.commons-lab.org/kg/>
+    PREFIX enpkgmodule: <https://enpkg.commons-lab.org/module/>
+    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+    PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+              
+    SELECT DISTINCT ?feature ?feature_opp ?ik2d ?rt ?rt_opp
+    WHERE
+    { 
+        ?sample rdf:type enpkg:LabExtract
+        FILTER(regex(str(?sample), "VGF156_A06"))
+        
+        ?sample enpkg:has_LCMS ?lcms .
+            ?lcms rdf:type enpkg:LCMSAnalysisPos .
+            ?lcms enpkg:has_lcms_feature_list ?feature_list .
+                ?feature_list enpkg:has_lcms_feature ?feature .                    
+                    ?feature enpkg:has_retention_time ?rt .
+                    ?feature enpkg:has_sirius_annotation ?sirius .
+                        ?sirius enpkg:has_InChIkey2D ?ik2d .
+                        
+            
+        ?sample enpkg:has_LCMS ?lcms_opp .
+        ?lcms_opp rdf:type enpkg:LCMSAnalysisNeg .
+        ?lcms_opp enpkg:has_lcms_feature_list ?feature_list_opp .
+            ?feature_list_opp enpkg:has_lcms_feature ?feature_opp .
+                ?feature_opp enpkg:has_retention_time ?rt_opp .
+                ?feature_opp enpkg:has_sirius_annotation ?sirius_opp .
+                    ?sirius_opp enpkg:has_InChIkey2D ?ik2d .
+
+        FILTER(((?rt - 0.05) < ?rt_opp) && ((?rt + 0.05) > ?rt_opp))
+    }
+""")
+
 
 results = sparql.queryAndConvert()
 df = json_normalize(results['results']["bindings"])
