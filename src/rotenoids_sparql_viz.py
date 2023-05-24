@@ -20,7 +20,7 @@ import matplotlib.pyplot as plt
 uri_ref = 'https://enpkg.commons-lab.org/kg/'
 uri_module = 'https://enpkg.commons-lab.org/module/'
 
-sparql = SPARQLWrapper('http://FASIE-1439:7200/repositories/graph_sandbox')
+sparql = SPARQLWrapper('https://enpkg.commons-lab.org/graphdb/repositories/ENPKG')
 sparql.setReturnFormat(JSON)
 
 ### TMAP OF MEMO VECTORS OF THE 1,600 SET

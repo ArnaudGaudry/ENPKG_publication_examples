@@ -47,7 +47,7 @@ def compute_tmap(table):
 uri_ref = 'https://enpkg.commons-lab.org/kg/'
 uri_module = 'https://enpkg.commons-lab.org/module/'
 
-sparql = SPARQLWrapper('http://FASIE-1439:7200/repositories/graph_sandbox')
+sparql = SPARQLWrapper('https://enpkg.commons-lab.org/graphdb/repositories/ENPKG')
 sparql.setReturnFormat(JSON)
 
 # Get all ChEMBL annotation with an activity given as an IC50 against L. donovani
