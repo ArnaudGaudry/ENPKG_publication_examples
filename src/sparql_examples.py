@@ -1,4 +1,3 @@
-#from SPARQLWrapper import SPARQLWrapper, JSON
 import pandas as pd
 import numpy as np
 from pandas import json_normalize
@@ -184,6 +183,12 @@ sparql.setQuery("""
     SELECT ?active_extract ?material ?wd_id ?taxon
     WHERE
     { 
+        service <https://query.wikidata.org/sparql> {
+              ?wd_id wdt:P225 ?taxon .
+            }
+
+        { SELECT ?active_extract ?material ?wd_id WHERE
+    { 
         ?active_extract rdf:type enpkg:LabExtract .
           ?active_extract enpkgmodule:has_bioassay_results ?biores .
           ?active_extract enpkgmodule:has_bioassay_results ?toxres .
@@ -194,10 +199,10 @@ sparql.setQuery("""
         FILTER((?tc_inhib > 80) && (?l6_inhib < 50))
         ?material enpkg:has_lab_process ?active_extract .
           ?material enpkg:has_wd_id ?wd_id .
-          service <https://query.wikidata.org/sparql> {
-              ?wd_id wdt:P225 ?taxon .
-            }
+
+        }
     }
+}
 """)
 
 results = sparql.queryAndConvert()
@@ -387,49 +392,53 @@ df
 
 
 # Query 6:  Return compounds annotated in Melochia and active in ChEMBL, \
-    # with the taxa they are reported in
+    # with the taxa they are reported in in Wikidata
 
 sparql.setQuery("""
     PREFIX enpkg: <https://enpkg.commons-lab.org/kg/>
     PREFIX enpkgmodule: <https://enpkg.commons-lab.org/module/>
     PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
     PREFIX wdt: <http://www.wikidata.org/prop/direct/>
+    PREFIX wd: <http://www.wikidata.org/entity/>
 
     SELECT DISTINCT ?ik ?chemblid ?name ?type ?value ?wd_id ?taxon ?taxon_name
     WHERE
-    { 
-      ?sample rdf:type enpkg:LabExtract
-      FILTER(regex(str(?sample), "VGF156_A06"))
-      ?sample enpkg:has_LCMS ?lcms .
-        ?lcms rdf:type ?LCMSAnalysisPos .
-        ?lcms enpkg:has_lcms_feature_list ?feature_list .
-          ?feature_list enpkg:has_lcms_feature ?feature .
-            {?feature enpkg:has_sirius_annotation ?annotation .
-              ?annotation enpkg:has_InChIkey2D ?ik2d .
-              ?annotation enpkg:has_cosmic_score ?cosmic .
-              ?annotation enpkg:has_zodiac_score ?zodiac .
-              FILTER((?cosmic > 0.5) && (?zodiac > 0.8))}
-              UNION
-            {?feature enpkg:has_isdb_annotation ?annotation .
-              ?annotation enpkg:has_taxo_score ?taxo .
-              FILTER(?taxo >= 6)}
-              
-              ?annotation enpkg:has_InChIkey2D ?ik2d .
-                ?ik2d enpkg:has_smiles ?smiles .
-                ?ik2d enpkg:is_InChIkey2D_of ?ik .
-                  ?ik enpkgmodule:has_chembl_id ?chemblid .
-                    ?chemblid enpkgmodule:has_chembl_activity ?chembl_activity .
-                      ?chembl_activity enpkgmodule:target_name ?name .
-                      ?chembl_activity enpkgmodule:activity_type ?type .
-                      ?chembl_activity enpkgmodule:activity_value ?value .
-                      FILTER(regex(str(?name), "Trypanosoma cruzi"))
-              OPTIONAL {
-                ?ik enpkg:has_wd_id ?wd_id .
-                service <https://query.wikidata.org/sparql> {
-                  ?wd_id wdt:P703 ?taxon .
-                    ?taxon wdt:P225 ?taxon_name .
-                  } 
-                }          
+    { service <https://query.wikidata.org/sparql> {
+            ?wd_id wdt:P31 wd:Q11173 .
+                ?wd_id wdt:P703 ?taxon .
+                ?taxon wdt:P225 ?taxon_name .
+        }   
+        { SELECT DISTINCT ?ik ?chemblid ?name ?type ?value ?wd_id
+            WHERE
+            { 
+                ?sample rdf:type enpkg:LabExtract
+                FILTER(regex(str(?sample), "VGF156_A06"))
+                ?sample enpkg:has_LCMS ?lcms .
+                    ?lcms rdf:type ?LCMSAnalysisPos .
+                    ?lcms enpkg:has_lcms_feature_list ?feature_list .
+                        ?feature_list enpkg:has_lcms_feature ?feature .
+                            {?feature enpkg:has_sirius_annotation ?annotation .
+                                ?annotation enpkg:has_InChIkey2D ?ik2d .
+                                ?annotation enpkg:has_cosmic_score ?cosmic .
+                                ?annotation enpkg:has_zodiac_score ?zodiac .
+                                FILTER((?cosmic > 0.5) && (?zodiac > 0.8))}
+                            UNION
+                            {?feature enpkg:has_isdb_annotation ?annotation .
+                                ?annotation enpkg:has_taxo_score ?taxo .
+                                FILTER(?taxo >= 6)}
+
+                ?annotation enpkg:has_InChIkey2D ?ik2d .
+                    ?ik2d enpkg:has_smiles ?smiles .
+                    ?ik2d enpkg:is_InChIkey2D_of ?ik .
+                        ?ik enpkgmodule:has_chembl_id ?chemblid .
+                        ?ik enpkg:has_wd_id ?wd_id .
+                            ?chemblid enpkgmodule:has_chembl_activity ?chembl_activity .
+                            ?chembl_activity enpkgmodule:target_name ?name .
+                            FILTER(regex(str(?name), "Trypanosoma cruzi")) 
+                            ?chembl_activity enpkgmodule:activity_type ?type .
+                            ?chembl_activity enpkgmodule:activity_value ?value .
+        }
+        }      
     }
 """)
 
