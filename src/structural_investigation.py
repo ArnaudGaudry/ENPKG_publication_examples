@@ -238,7 +238,7 @@ fig.write_image(f"../data/structural_investigation/tmap/chembl_annot_color_{cate
 
 # Sachem similarity
 
-# Query to return Sirius annotations in a given samples, ordered by relative intensity
+# Query to return annotations in a given samples, and similarity with a given compound
 sparql.setQuery("""
     PREFIX enpkg: <https://enpkg.commons-lab.org/kg/>
     PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -276,8 +276,8 @@ sparql.setQuery("""
                                     sachem:query "CC1=C(C(=O)C=C2C1=CC=C3C2(CCC4(C3(CCC5(C4CC(=C)CC5)C)C)C)C)O";
                                     sachem:cutoff "0.01"^^xsd:double ].
                       }   }                  
-                ?feature enpkg:has_retention_time ?rt .
-                ?feature enpkg:has_relative_feature_area ?rel_area .
+                # ?feature enpkg:has_retention_time ?rt .
+                # ?feature enpkg:has_relative_feature_area ?rel_area .
     } GROUP BY ?ik2d
 """)
 

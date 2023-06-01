@@ -46,12 +46,12 @@ sparql.setQuery("""
               ?toxres enpkgmodule:inhibition_percentage ?tox .
          ?material enpkg:has_lab_process ?extract .
             ?material enpkgmodule:has_organe ?organe
-            OPTIONAL {
-              ?material enpkg:has_wd_id ?wd_id .
-              service <https://query.wikidata.org/sparql> {
-                  ?wd_id wdt:P225 ?taxon
-                }
-              }
+            #  OPTIONAL {
+            #   ?material enpkg:has_wd_id ?wd_id .
+            #   service <https://query.wikidata.org/sparql> {
+            #       ?wd_id wdt:P225 ?taxon
+            #     }
+            #   }
     }
 """
 )
@@ -61,7 +61,7 @@ df = json_normalize(results['results']["bindings"])
 df = df.stack().str.replace(uri_ref, "").unstack()
 df.drop(list(df.filter(regex = 'type')), axis = 1, inplace = True)
 df.columns = df.columns.str.replace('.value', '')
-df.taxon = df.taxon.fillna('unresolved')
+#df.taxon = df.taxon.fillna('unresolved')
 df.tcact = df.tcact.astype(float)
 df.tox = df.tox.astype(float)
 
