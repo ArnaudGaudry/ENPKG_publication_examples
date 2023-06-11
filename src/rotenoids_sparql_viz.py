@@ -1,7 +1,6 @@
 import pandas as pd
 from pandas import json_normalize
 from SPARQLWrapper import SPARQLWrapper, JSON
-import pandas as pd
 import numpy as np
 from rdkit import Chem, DataStructs
 from rdkit.Chem import AllChem
@@ -10,7 +9,6 @@ from sklearn.decomposition import PCA
 from tqdm import tqdm
 import plotly.express as px
 import tmap as tm
-import numpy as np
 from map4 import MAP4Calculator
 import datatable as dt
 from tqdm import tqdm
@@ -24,7 +22,6 @@ sparql = SPARQLWrapper('https://enpkg.commons-lab.org/graphdb/repositories/ENPKG
 sparql.setReturnFormat(JSON)
 
 ### TMAP OF MEMO VECTORS OF THE 1,600 SET
-
 
 # Get samples metadata
 sparql.setQuery("""
