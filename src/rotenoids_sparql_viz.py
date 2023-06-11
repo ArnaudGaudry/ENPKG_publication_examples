@@ -46,12 +46,6 @@ sparql.setQuery("""
               ?toxres enpkgmodule:inhibition_percentage ?tox .
          ?material enpkg:has_lab_process ?extract .
             ?material enpkgmodule:has_organe ?organe
-            #  OPTIONAL {
-            #   ?material enpkg:has_wd_id ?wd_id .
-            #   service <https://query.wikidata.org/sparql> {
-            #       ?wd_id wdt:P225 ?taxon
-            #     }
-            #   }
     }
 """
 )

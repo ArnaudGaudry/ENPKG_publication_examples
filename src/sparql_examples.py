@@ -17,10 +17,7 @@ sparql.setReturnFormat(JSON)
 
 sparql.setQuery("""
     PREFIX enpkg: <https://enpkg.commons-lab.org/kg/>
-    PREFIX enpkgmodule: <https://enpkg.commons-lab.org/module/>
     PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-    PREFIX wdt: <http://www.wikidata.org/prop/direct/>
-    PREFIX wd: <http://www.wikidata.org/entity/>
 
     SELECT (COUNT(?feature) as ?count)
     WHERE
@@ -149,7 +146,7 @@ df.drop(list(df.filter(regex = 'type')), axis = 1, inplace = True)
 df.columns = df.columns.str.replace('.value', '')
 df
 
-# Query to return the number og wd ID from IK2D in annotations
+# Query to return the number of wd ID from IK2D in annotations
 
 sparql.setQuery("""
     PREFIX enpkg: <https://enpkg.commons-lab.org/kg/>
@@ -180,29 +177,28 @@ sparql.setQuery("""
     PREFIX wdt: <http://www.wikidata.org/prop/direct/>
     PREFIX wd: <http://www.wikidata.org/entity/>
 
-    SELECT ?active_extract ?material ?wd_id ?taxon
+    SELECT ?active_extract ?material ?wd_id ?taxon ?organe
     WHERE
-    { 
-        service <https://query.wikidata.org/sparql> {
-              ?wd_id wdt:P225 ?taxon .
+        { 
+            service <https://query.wikidata.org/sparql> {
+                    ?wd_id wdt:P225 ?taxon .
+                }
+            { SELECT ?active_extract ?material ?wd_id ?organe WHERE
+        { 
+            ?active_extract rdf:type enpkg:LabExtract .
+                ?active_extract enpkgmodule:has_bioassay_results ?biores .
+                ?active_extract enpkgmodule:has_bioassay_results ?toxres .
+                    ?biores rdf:type enpkgmodule:Tcruzi10ugml .
+                    ?toxres rdf:type enpkgmodule:L610ugml .
+                        ?biores enpkgmodule:inhibition_percentage ?tc_inhib .
+                        ?toxres enpkgmodule:inhibition_percentage ?l6_inhib .
+                        FILTER((?tc_inhib > 80) && (?l6_inhib < 50))
+            ?material enpkg:has_lab_process ?active_extract .
+            ?material enpkgmodule:has_organe ?organe .
+                ?material enpkg:has_wd_id ?wd_id .
+                }
             }
-
-        { SELECT ?active_extract ?material ?wd_id WHERE
-    { 
-        ?active_extract rdf:type enpkg:LabExtract .
-          ?active_extract enpkgmodule:has_bioassay_results ?biores .
-          ?active_extract enpkgmodule:has_bioassay_results ?toxres .
-            ?biores rdf:type enpkgmodule:Tcruzi10ugml .
-            ?toxres rdf:type enpkgmodule:L610ugml .
-              ?biores enpkgmodule:inhibition_percentage ?tc_inhib .
-              ?toxres enpkgmodule:inhibition_percentage ?l6_inhib .
-        FILTER((?tc_inhib > 80) && (?l6_inhib < 50))
-        ?material enpkg:has_lab_process ?active_extract .
-          ?material enpkg:has_wd_id ?wd_id .
-
         }
-    }
-}
 """)
 
 results = sparql.queryAndConvert()
@@ -458,7 +454,7 @@ sparql.setQuery("""
     PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
     PREFIX wdt: <http://www.wikidata.org/prop/direct/>
               
-    SELECT ?feature (SAMPLE(?rt) AS ?rt) (SAMPLE(?parentmass) AS ?parentmass) (COUNT(?peakloss) AS ?count) WHERE
+    SELECT ?feature (SAMPLE(?rt) AS ?rt) (SAMPLE(?parent_mass) AS ?parent_mass) (COUNT(?peakloss) AS ?count) WHERE
           { 
             ?feature rdf:type enpkg:LCMSFeature .
             ?feature enpkg:has_spec2vec_doc ?doc .
@@ -491,7 +487,7 @@ sparql.setQuery("""
     PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
     PREFIX wdt: <http://www.wikidata.org/prop/direct/>
               
-    SELECT DISTINCT ?feature ?rt ?pm #?feature_opp ?rt_opp ?pm_opp
+    SELECT DISTINCT ?feature ?rt ?pm ?feature_opp ?rt_opp ?pm_opp
     WHERE
     { 
         VALUES ?ppm {

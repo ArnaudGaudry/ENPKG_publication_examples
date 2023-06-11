@@ -247,7 +247,7 @@ sparql.setQuery("""
     PREFIX idsm: <https://idsm.elixir-czech.cz/sparql/endpoint/>
     PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
     
-    SELECT ?ik2d (SAMPLE(?smiles) AS ?smiles) (SAMPLE(?SCORE) AS ?SCORE) #?feature ?annotation ?ik2d ?rt ?rel_area ?smiles
+    SELECT ?ik2d (SAMPLE(?smiles) AS ?smiles) (SAMPLE(?SCORE) AS ?SCORE) #?feature ?annotation ?rt ?rel_area ?smiles
     WHERE
     {   ?sample rdf:type enpkg:LabExtract .
         FILTER(regex(str(?sample), "VGF141_B11"))
