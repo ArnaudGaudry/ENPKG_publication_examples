@@ -196,13 +196,10 @@ sparql.setQuery("""
     {
       SELECT DISTINCT ?ik_2d (COUNT(DISTINCT(?sample)) AS ?count_in_group)
       WHERE {   
-        {?annotation rdf:type enpkg:SiriusStructureAnnotation .
+        ?annotation rdf:type enpkg:SiriusStructureAnnotation .
             ?annotation enpkg:has_cosmic_score ?cosmic .
-            FILTER(?cosmic >= 0.4)}
-        UNION
-        {?annotation rdf:type enpkg:IsdbAnnotation .
-          ?annotation enpkg:has_isdb_taxo_score ?taxo_score .
-          FILTER(?taxo_score >= 6)} 
+            FILTER(?cosmic >= 0.4)
+        
         ?annotation enpkg:has_InChIkey2D ?ik_2d . 
           ?feature enpkg:has_sirius_annotation|enpkg:has_isdb_annotation ?annotation .
             ?feature_list enpkg:has_lcms_feature ?feature .
@@ -214,13 +211,9 @@ sparql.setQuery("""
       {
         SELECT DISTINCT ?ik_2d (COUNT(DISTINCT(?sample)) AS ?count)
         WHERE {   
-          {?annotation rdf:type enpkg:SiriusStructureAnnotation .
+          ?annotation rdf:type enpkg:SiriusStructureAnnotation .
             ?annotation enpkg:has_cosmic_score ?cosmic .
-            FILTER(?cosmic >= 0.4)}
-          UNION
-          {?annotation rdf:type enpkg:IsdbAnnotation .
-            ?annotation enpkg:has_isdb_taxo_score ?taxo_score .
-            FILTER(?taxo_score >= 6)} 
+            FILTER(?cosmic >= 0.4)
           ?annotation enpkg:has_InChIkey2D ?ik_2d . 
             ?feature enpkg:has_sirius_annotation|enpkg:has_isdb_annotation ?annotation .
               ?feature_list enpkg:has_lcms_feature ?feature .
@@ -316,7 +309,7 @@ df['sel_pathway'] = np.where((
   (df['np_pathway'] == 'npc_Shikimates_and_Phenylpropanoids')|
   (df['np_pathway'] == 'npc_Fatty_acids')), df['np_pathway'], 'Other')
 
-px.scatter(x = df['x'], y = df['y'], color = df['sel_class'], hover_name=df['ik_2d'])
+px.scatter(x = df['x'], y = df['y'], color = df['specificity'], hover_name=df['ik_2d'])
 
 #rotenone: JUVIOZPCNVVQFO
 #deguelin: ORDAZKGHSNRHTD

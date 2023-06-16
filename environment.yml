@@ -15,10 +15,10 @@ dependencies:
   - plotly
   - ipython
   - ipykernel
-  - datatable
   - matplotlib
   - umap-learn
   - pip
   - pip:
     - git+https://github.com/reymond-group/map4
     - mhfp
+    - datatable

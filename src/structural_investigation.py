@@ -4,15 +4,11 @@ from SPARQLWrapper import SPARQLWrapper, JSON
 from rdkit.Chem import PandasTools
 import pandas as pd
 import numpy as np
-from rdkit import Chem, DataStructs
 from rdkit.Chem import AllChem
-from sklearn.manifold import TSNE
-from sklearn.decomposition import PCA
-from tqdm import tqdm
 import plotly.express as px
 import tmap as tm
 from mhfp.encoder import MHFPEncoder
-from faerun import Faerun
+from map4 import MAP4Calculator
 import numpy as np
 import plotly.graph_objects as go
 
@@ -21,7 +17,8 @@ import plotly.graph_objects as go
 
 def compute_tmap(table):
     
-    enc = MHFPEncoder(1024)
+    #enc = MHFPEncoder(1024)
+    MAP4 = MAP4Calculator(dimensions=1024)
     lf = tm.LSHForest(1024, 64)
     
     i = 0
@@ -30,9 +27,11 @@ def compute_tmap(table):
         if i != 0 and i % 10 == 0:
                 print(100 * i / len(table))
         mol = AllChem.MolFromSmiles(row["smiles"])
-        fps.append(tm.VectorUint(enc.encode_mol(mol)))        
+        fps.append(mol) 
+        #fps.append(tm.VectorUint(enc.encode_mol(mol)))        
         i+=1
-
+        
+    fps = MAP4.calculate_many(fps)
     lf.batch_add(fps)
     lf.index()
 
@@ -143,7 +142,7 @@ for cat in categories:
 #                  hover_name=df['ik'])
 # fig.update_layout(template='simple_white')
 
-category = 'activity'
+category = 'feature'
 
 fig = go.Figure()
 # Plot tree
@@ -230,9 +229,9 @@ fig.update_yaxes(visible=False)
 
 fig.show()
   
-fig.write_html(f"../data/structural_investigation/tmap/chembl_annot_color_{category}.html")
-fig.write_image(f"../data/structural_investigation/tmap/chembl_annot_color_{category}.jpeg",  scale=3)
-fig.write_image(f"../data/structural_investigation/tmap/chembl_annot_color_{category}.svg",  scale=3)
+fig.write_html(f"../output/structural_investigation/tmap/chembl_annot_color_{category}.html")
+fig.write_image(f"../output/structural_investigation/tmap/chembl_annot_color_{category}.jpeg",  scale=3)
+fig.write_image(f"../output/structural_investigation/tmap/chembl_annot_color_{category}.svg",  scale=3)
 
 
 
@@ -270,12 +269,11 @@ sparql.setQuery("""
                     ?ik2d enpkg:is_InChIkey2D_of ?ik .
                       ?ik enpkg:has_wd_id ?wd_id .
                       SERVICE idsm:wikidata {
-                        SELECT * WHERE {
                             [ sachem:compound ?wd_id;
                                 sachem:score ?SCORE ] sachem:similaritySearch [
                                     sachem:query "CC1=C(C(=O)C=C2C1=CC=C3C2(CCC4(C3(CCC5(C4CC(=C)CC5)C)C)C)C)O";
                                     sachem:cutoff "0.01"^^xsd:double ].
-                      }   }                  
+                      }                    
                 # ?feature enpkg:has_retention_time ?rt .
                 # ?feature enpkg:has_relative_feature_area ?rel_area .
     } GROUP BY ?ik2d
@@ -367,9 +365,9 @@ fig.update_yaxes(visible=False)
 fig.show()
 
   
-fig.write_html(f"../data/structural_investigation/tmap/pristimera_color_similarity.html")
-fig.write_image(f"../data/structural_investigation/tmap/pristimera_color_similarity.jpeg",  scale=3)
-fig.write_image(f"../data/structural_investigation/tmap/pristimera_color_similarity.svg",  scale=3)
+fig.write_html(f"../output/structural_investigation/tmap/pristimera_color_similarity.html")
+fig.write_image(f"../output/structural_investigation/tmap/pristimera_color_similarity.jpeg",  scale=3)
+fig.write_image(f"../output/structural_investigation/tmap/pristimera_color_similarity.svg",  scale=3)
 
 
 
